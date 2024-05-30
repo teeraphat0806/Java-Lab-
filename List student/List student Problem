@@ -1,0 +1,51 @@
+Problem
+Write a Java program that manages a list of students. 
+Each student has a name and a list of grades. The program should allow the user to:Add a new student.
+Add grades for a student.Calculate and display the average grade for a student.
+Display the student with the highest average grade.
+
+Example of Input and Output
+Example 1Welcome to the Student Manager!
+Available commands:
+add student - Add a new student
+add grade - Add grades for a student
+average grade - Display the average grade for a student
+highest average - Display the student with the highest average grade
+exit - Exit the program
+Enter command: add student
+Enter student name: Alice
+Student added successfully.
+Enter command: add grade
+Enter student name: Alice
+Enter grade: 90
+Grade added successfully.
+Enter command: add grade
+Enter student name: Alice
+Enter grade: 85
+Grade added successfully.
+Enter command: average grade
+Enter student name: Alice
+Average grade for Alice: 87.50
+Enter command: highest average
+Student with the highest average grade: Alice (87.50)
+Enter command: exit
+Exiting the program.
+
+Example 2Enter command: add student
+Enter student name: Bob
+Student added successfully.
+Enter command: add grade
+Enter student name: Bob
+Enter grade: 75
+Grade added successfully.
+Enter command: add student
+Enter student name: Charlie
+Student added successfully.
+Enter command: add grade
+Enter student name: Charlie
+Enter grade: 95
+Grade added successfully.
+Enter command: highest average
+Student with the highest average grade: Charlie (95.00)
+Enter command: exit
+Exiting the program. I want to add this to readme file in GitHub make it look better
