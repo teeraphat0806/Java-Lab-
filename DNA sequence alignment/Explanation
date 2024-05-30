@@ -1,0 +1,59 @@
+Detailed Explanation of the DNA Sequence Alignment Code
+The Needleman-Wunsch algorithm is used for global sequence alignment. 
+It finds the best alignment between two sequences by considering matches, mismatches, and gaps.
+
+Explanation
+1. User InputThe program starts by getting user input for two DNA sequences and the scoring system (match score, mismatch penalty, and gap penalty).2. Needleman-Wunsch AlgorithmThe needlemanWunsch method performs the sequence alignment using the Needleman-Wunsch algorithm.InitializationThe score matrix scoreMatrix is initialized. This matrix will store the scores of the alignments. The dimensions of the matrix are (n+1) x (m+1) where n and m are the lengths of the two sequences. The first row and first column are initialized to represent the gap penalties.for (int i = 0; i <= n; i++) {
+    scoreMatrix[i][0] = i * gapPenalty;
+}
+for (int j = 0; j <= m; j++) {
+    scoreMatrix[0][j] = j * gapPenalty;
+}Filling the Score MatrixThe matrix is filled based on the scoring rules:match: the score from the diagonal (i.e., previous characters matched) plus the match score if characters match, otherwise mismatch penalty.delete: the score from the cell above plus the gap penalty.insert: the score from the cell to the left plus the gap penalty.The value in each cell is the maximum of these three scores, representing the best possible alignment up to that point.for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= m; j++) {
+        int match = scoreMatrix[i - 1][j - 1] + (seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchPenalty);
+        int delete = scoreMatrix[i - 1][j] + gapPenalty;
+        int insert = scoreMatrix[i][j - 1] + gapPenalty;
+        scoreMatrix[i][j] = Math.max(match, Math.max(delete, insert));
+    }
+}
+Traceback to Find the Alignment
+After filling the score matrix, we perform a traceback to determine the actual alignment. 
+Starting from the bottom-right cell of the matrix, we trace back to the top-left cell to build the aligned sequences.
+If characters match or mismatch (diagonal move), both sequences' characters are aligned.
+If the move is up, it indicates a gap in the second sequence.If the move is left, it indicates a gap in the first sequence.
+
+StringBuilder align1 = new StringBuilder();
+StringBuilder align2 = new StringBuilder();
+int i = n, j = m;
+while (i > 0 && j > 0) {
+    if (seq1.charAt(i - 1) == seq2.charAt(j - 1)) {
+        align1.append(seq1.charAt(i - 1));
+        align2.append(seq2.charAt(j - 1));
+        i--;
+        j--;
+    } else if (scoreMatrix[i - 1][j] + gapPenalty == scoreMatrix[i][j]) {
+        align1.append(seq1.charAt(i - 1));
+        align2.append('-');
+        i--;
+    } else {
+        align1.append('-');
+        align2.append(seq2.charAt(j - 1));
+        j--;
+    }
+}
+while (i > 0) {
+    align1.append(seq1.charAt(i - 1));
+    align2.append('-');
+    i--;
+}
+while (j > 0) {
+    align1.append('-');
+    align2.append(seq2.charAt(j - 1));
+    j--;
+}
+
+Finally, we reverse the aligned sequences because we constructed them backwards during the traceback process.
+return new String[]{align1.reverse().toString(), align2.reverse().toString(), Integer.toString(scoreMatrix[n][m])};
+SummaryThis program aligns two DNA sequences using the Needleman-Wunsch algorithm. It:Initializes a score matrix to keep track of alignment scores.
+Fills the score matrix based on match, mismatch, and gap penalties.Performs a traceback to find the optimal alignment.Outputs the aligned sequences and the alignment score.
+This code provides a solid foundation for understanding sequence alignment, a key task in bioinformatics, and demonstrates how dynamic programming can solve complex problems efficiently.
