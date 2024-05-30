@@ -1,0 +1,32 @@
+public class Knapsack {
+
+    public static void main(String[] args) {
+        int[] weights = {2, 3, 4, 5};
+        int[] values = {3, 4, 5, 6};
+        int maxWeight = 5;
+
+        int maxValue = knapsack(weights, values, maxWeight);
+        System.out.println("Maximum value in knapsack = " + maxValue);
+    }
+
+    public static int knapsack(int[] weights, int[] values, int maxWeight) {
+        int n = weights.length;
+        int[][] dp = new int[n + 1][maxWeight + 1];
+
+        // Build the dp array
+        for (int i = 1; i <= n; i++) {
+            for (int w = 1; w <= maxWeight; w++) {
+                if (weights[i - 1] <= w) {
+                    // Include the item or exclude the item
+                    dp[i][w] = Math.max(values[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w]);
+                } else {
+                    // Exclude the item
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+
+        // The maximum value is stored in dp[n][maxWeight]
+        return dp[n][maxWeight];
+    }
+}
