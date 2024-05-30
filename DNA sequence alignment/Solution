@@ -1,0 +1,82 @@
+import java.util.Scanner;
+
+public class DNASequenceAlignment {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the DNA Sequence Alignment Tool!");
+        System.out.print("Enter the first DNA sequence: ");
+        String seq1 = scanner.nextLine().toUpperCase();
+        System.out.print("Enter the second DNA sequence: ");
+        String seq2 = scanner.nextLine().toUpperCase();
+
+        System.out.print("Enter match score: ");
+        int matchScore = scanner.nextInt();
+        System.out.print("Enter mismatch penalty: ");
+        int mismatchPenalty = scanner.nextInt();
+        System.out.print("Enter gap penalty: ");
+        int gapPenalty = scanner.nextInt();
+
+        String[] result = needlemanWunsch(seq1, seq2, matchScore, mismatchPenalty, gapPenalty);
+        System.out.println("\nOptimal alignment:");
+        System.out.println(result[0]);
+        System.out.println(result[1]);
+        System.out.println("\nAlignment score: " + result[2]);
+
+        scanner.close();
+    }
+
+    private static String[] needlemanWunsch(String seq1, String seq2, int matchScore, int mismatchPenalty, int gapPenalty) {
+        int n = seq1.length();
+        int m = seq2.length();
+        int[][] scoreMatrix = new int[n + 1][m + 1];
+
+        for (int i = 0; i <= n; i++) {
+            scoreMatrix[i][0] = i * gapPenalty;
+        }
+        for (int j = 0; j <= m; j++) {
+            scoreMatrix[0][j] = j * gapPenalty;
+        }
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                int match = scoreMatrix[i - 1][j - 1] + (seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchPenalty);
+                int delete = scoreMatrix[i - 1][j] + gapPenalty;
+                int insert = scoreMatrix[i][j - 1] + gapPenalty;
+                scoreMatrix[i][j] = Math.max(match, Math.max(delete, insert));
+            }
+        }
+
+        StringBuilder align1 = new StringBuilder();
+        StringBuilder align2 = new StringBuilder();
+        int i = n, j = m;
+        while (i > 0 && j > 0) {
+            if (seq1.charAt(i - 1) == seq2.charAt(j - 1)) {
+                align1.append(seq1.charAt(i - 1));
+                align2.append(seq2.charAt(j - 1));
+                i--;
+                j--;
+            } else if (scoreMatrix[i - 1][j] + gapPenalty == scoreMatrix[i][j]) {
+                align1.append(seq1.charAt(i - 1));
+                align2.append('-');
+                i--;
+            } else {
+                align1.append('-');
+                align2.append(seq2.charAt(j - 1));
+                j--;
+            }
+        }
+        while (i > 0) {
+            align1.append(seq1.charAt(i - 1));
+            align2.append('-');
+            i--;
+        }
+        while (j > 0) {
+            align1.append('-');
+            align2.append(seq2.charAt(j - 1));
+            j--;
+        }
+
+        return new String[]{align1.reverse().toString(), align2.reverse().toString(), Integer.toString(scoreMatrix[n][m])};
+    }
+}
