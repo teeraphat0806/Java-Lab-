@@ -1,0 +1,19 @@
+Problem: DNA Sequence AlignmentProblem DescriptionIn bioinformatics, comparing DNA sequences is a common task. 
+The Needleman-Wunsch algorithm is a dynamic programming algorithm used for sequence alignment. 
+Given two DNA sequences, the algorithm finds the best alignment considering matches, mismatches, and gaps.
+Create a Java program that aligns two DNA sequences using the Needleman-Wunsch algorithm. 
+The program should allow the user to:Input two DNA sequences.Specify the scoring system (match score, mismatch penalty, and gap penalty).
+Output the optimal alignment and the alignment score.
+Example Input and OutputWelcome to the DNA Sequence Alignment Tool!
+
+Enter the first DNA sequence: AGCTG
+Enter the second DNA sequence: AGTTG
+Enter match score: 1
+Enter mismatch penalty: -1
+Enter gap penalty: -2
+
+Optimal alignment:
+AGCTG
+AG-TG
+
+Alignment score: 2
