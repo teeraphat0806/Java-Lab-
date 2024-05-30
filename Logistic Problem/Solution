@@ -1,0 +1,150 @@
+import java.util.*;
+
+class Location {
+    String name;
+    ArrayList<Integer> travelTimes;
+
+    public Location(String name) {
+        this.name = name;
+        this.travelTimes = new ArrayList<>();
+    }
+
+    public void addTravelTime(int time) {
+        travelTimes.add(time);
+    }
+}
+
+class LogisticsGraph {
+    int V, E;
+    List<Edge> edges;
+    String[] locations;
+
+    LogisticsGraph(int V, int E, String[] locations) {
+        this.V = V;
+        this.E = E;
+        this.edges = new ArrayList<>();
+        this.locations = locations;
+    }
+
+    void addEdge(int src, int dest, int weight) {
+        edges.add(new Edge(src, dest, weight));
+    }
+
+    void johnson() {
+        // Step 1: Add a new vertex 's' and connect it to all other vertices with edge weight 0
+        LogisticsGraph g = new LogisticsGraph(V + 1, E + V, null);
+        for (Edge edge : edges) {
+            g.addEdge(edge.src, edge.dest, edge.weight);
+        }
+        for (int i = 0; i < V; i++) {
+            g.addEdge(V, i, 0);
+        }
+
+        // Step 2: Run Bellman-Ford algorithm to find shortest path from 's' to all other vertices
+        int[] h = new int[V + 1];
+        if (!bellmanFord(g, V, h)) {
+            System.out.println("Graph contains a negative weight cycle");
+            return;
+        }
+
+        // Step 3: Reweight the original graph
+        for (Edge edge : edges) {
+            edge.weight += h[edge.src] - h[edge.dest];
+        }
+
+        // Step 4: Run Dijkstra's algorithm for each vertex
+        int[][] dist = new int[V][V];
+        for (int i = 0; i < V; i++) {
+            dijkstra(i, dist[i], h);
+        }
+
+        // Step 5: Print the shortest path distances
+        System.out.println("Shortest travel times between every pair of locations:");
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                System.out.printf("%s to %s: %d minutes%n", locations[i], locations[j], dist[i][j]);
+            }
+        }
+    }
+
+    boolean bellmanFord(LogisticsGraph g, int src, int[] h) {
+        Arrays.fill(h, Integer.MAX_VALUE);
+        h[src] = 0;
+
+        for (int i = 0; i < g.V; i++) {
+            for (Edge edge : g.edges) {
+                if (h[edge.src] != Integer.MAX_VALUE && h[edge.src] + edge.weight < h[edge.dest]) {
+                    h[edge.dest] = h[edge.src] + edge.weight;
+                }
+            }
+        }
+
+        for (Edge edge : g.edges) {
+            if (h[edge.src] != Integer.MAX_VALUE && h[edge.src] + edge.weight < h[edge.dest]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void dijkstra(int src, int[] dist, int[] h) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+        pq.add(new int[]{src, 0});
+
+        while (!pq.isEmpty()) {
+            int[] node = pq.poll();
+            int u = node[0];
+
+            for (Edge edge : edges) {
+                if (edge.src == u) {
+                    int v = edge.dest;
+                    int weight = edge.weight;
+
+                    if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                        dist[v] = dist[u] + weight;
+                        pq.add(new int[]{v, dist[v]});
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < dist.length; i++) {
+            if (dist[i] != Integer.MAX_VALUE) {
+                dist[i] += h[i] - h[src];
+            }
+        }
+    }
+}
+
+class Edge {
+    int src, dest, weight;
+
+    Edge(int src, int dest, int weight) {
+        this.src = src;
+        this.dest = dest;
+        this.weight = weight;
+    }
+}
+
+public class JohnsonAlgorithmLogistics {
+    public static void main(String[] args) {
+        String[] locations = {"Warehouse A", "Warehouse B", "Delivery Point 1", "Delivery Point 2", "Delivery Point 3"};
+        int V = locations.length; // Number of locations
+        int E = 8; // Number of roads
+
+        LogisticsGraph graph = new LogisticsGraph(V, E, locations);
+
+        graph.addEdge(0, 1, 3);  // Warehouse A to Warehouse B
+        graph.addEdge(0, 2, 8);  // Warehouse A to Delivery Point 1
+        graph.addEdge(0, 4, -4); // Warehouse A to Delivery Point 3
+        graph.addEdge(1, 3, 1);  // Warehouse B to Delivery Point 2
+        graph.addEdge(1, 4, 7);  // Warehouse B to Delivery Point 3
+        graph.addEdge(2, 1, 4);  // Delivery Point 1 to Warehouse B
+        graph.addEdge(3, 0, 2);  // Delivery Point 2 to Warehouse A
+        graph.addEdge(3, 2, -5); // Delivery Point 2 to Delivery Point 1
+
+        graph.johnson();
+    }
+}
