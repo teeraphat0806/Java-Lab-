@@ -1,0 +1,69 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class MazeSolver {
+
+    // Direction vectors for moving up, down, left, and right
+    private static final int[] rowDir = {-1, 1, 0, 0};
+    private static final int[] colDir = {0, 0, -1, 1};
+    private static List<List<String>> allPaths;
+
+    public static void main(String[] args) {
+        int[][] maze = {
+            {0, 0, 1, 0},
+            {0, 0, 1, 0},
+            {0, 0, 0, 0},
+            {0, 1, 1, 0},
+            {0, 0, 0, 0}
+        };
+        int startX = 0, startY = 0;
+        int endX = 4, endY = 3;
+
+        List<List<String>> paths = findAllPaths(maze, startX, startY, endX, endY);
+
+        for (List<String> path : paths) {
+            System.out.println(path);
+        }
+    }
+
+    public static List<List<String>> findAllPaths(int[][] maze, int startX, int startY, int endX, int endY) {
+        allPaths = new ArrayList<>();
+        List<String> currentPath = new ArrayList<>();
+        boolean[][] visited = new boolean[maze.length][maze[0].length];
+
+        backtrack(maze, startX, startY, endX, endY, currentPath, visited);
+
+        return allPaths;
+    }
+
+    private static void backtrack(int[][] maze, int x, int y, int endX, int endY, List<String> currentPath, boolean[][] visited) {
+        // Check if out of bounds or on a wall or already visited
+        if (x < 0 || y < 0 || x >= maze.length || y >= maze[0].length || maze[x][y] == 1 || visited[x][y]) {
+            return;
+        }
+
+        // Add current position to path
+        currentPath.add("(" + x + "," + y + ")");
+        
+        // If we have reached the endpoint
+        if (x == endX && y == endY) {
+            allPaths.add(new ArrayList<>(currentPath));
+            currentPath.remove(currentPath.size() - 1); // Backtrack
+            return;
+        }
+
+        // Mark this cell as visited
+        visited[x][y] = true;
+
+        // Explore all four directions
+        for (int dir = 0; dir < 4; dir++) {
+            int newX = x + rowDir[dir];
+            int newY = y + colDir[dir];
+            backtrack(maze, newX, newY, endX, endY, currentPath, visited);
+        }
+
+        // Backtrack: unmark this cell and remove from current path
+        visited[x][y] = false;
+        currentPath.remove(currentPath.size() - 1);
+    }
+}
